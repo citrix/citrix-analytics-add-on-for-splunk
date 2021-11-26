@@ -1,0 +1,10 @@
+owner: thorstenr
+pipeline:
+  citool: ''
+  releaseBranch: ''
+  sonarqube: null
+productionUse: Internal
+repoType: Other
+reporting:
+  product: Analytics
+  teamname: CAS
