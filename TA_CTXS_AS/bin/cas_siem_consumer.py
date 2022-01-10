@@ -250,34 +250,34 @@ class CasSiemConsumer(Script):
                     'sasl.password': self.CLEAR_PASSWORD,
                     'ssl.ca.location': ca_location
             }
-            # Start Log debug output
-            self.debug_logging(ew, cas_siem_debug, "INFO", "Start script")
-            # Create Consumer instance
-            c = self.kafka_consumer(cas_siem_debug,conf,logger)
-
-            # Log debug output
-            self.debug_logging(ew, cas_siem_debug, "INFO", "Connected to host(s)")
-
-            # check if topic is available and exit script if not
-            topic_check = c.list_topics(cas_siem_topic, timeout=5)
-
-            if "Broker: Unknown topic or partition" in str(topic_check.topics):
-                ew.log("ERROR", "Unknown topic or partition. Please check config and fix settings")
-                c.close()
-                return 0
-
-            # Check number of partitions for used topic
-            partitions = topic_check.topics[cas_siem_topic].partitions
-            partitions_count = len(partitions.keys())
-
-            # Subscribe to topics
-            c.subscribe(topics)
-            # Log debug output
-            self.debug_logging(ew, cas_siem_debug, "INFO", "Subscribed to topic")
-            # Read messages from Kafka and send to Splunk
             try:
+                # Start Log debug output
+                self.debug_logging(ew, cas_siem_debug, "INFO", "Start script")
+                # Create Consumer instance
+                c = self.kafka_consumer(cas_siem_debug,conf,logger)
+
+                # Log debug output
+                self.debug_logging(ew, cas_siem_debug, "INFO", "Connected to host(s)")
+
+                # check if topic is available and exit script if not
+                topic_check = c.list_topics(cas_siem_topic, timeout=5)
+
+                if "Broker: Unknown topic or partition" in str(topic_check.topics):
+                    ew.log("ERROR", "Unknown topic or partition. Please check config and fix settings")
+                    c.close()
+                    return 0
+
+                # Check number of partitions for used topic
+                partitions = topic_check.topics[cas_siem_topic].partitions
+                partitions_count = len(partitions.keys())
+
+                # Subscribe to topics
+                c.subscribe(topics)
+                # Log debug output
+                self.debug_logging(ew, cas_siem_debug, "INFO", "Subscribed to topic")
                 # Log debug output
                 self.debug_logging(ew, cas_siem_debug, "INFO", "Start consuming events")
+                # Read messages from Kafka and send to Splunk
                 self.kafka_event_processing(c, ew, cas_siem_debug, event_counter, partitions_count, input_name)
             except Exception as error:
                 ew.log("ERROR", 'INPUT NAME ' + input_name + ' Script ended with error: ' + str(error))
